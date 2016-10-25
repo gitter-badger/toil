@@ -49,21 +49,21 @@ class AWSProvisionerTest(ToilTest):
         leader = AWSProvisioner.launchCluster(instanceType=self.instanceType, keyName=self.keyName,
                                               clusterName=self.clusterName)
 
-        venv_command = 'virtualenv --system-site-packages /home/venv'
+        venv_command = ['virtualenv', '--system-site-packages', '/home/venv']
         AWSProvisioner._sshAppliance(leader.ip_address, command=venv_command)
 
-        upgrade_command = '/home/venv/bin/pip install setuptools --upgrade'
+        upgrade_command = ['/home/venv/bin/pip', 'install', 'setuptools', '--upgrade']
         AWSProvisioner._sshAppliance(leader.ip_address, command=upgrade_command)
 
-        yaml_command = '/home/venv/bin/pip install pyyaml'
+        yaml_command = ['/home/venv/bin/pip', 'install', 'pyyaml']
         AWSProvisioner._sshAppliance(leader.ip_address, command=yaml_command)
 
         # install toil scripts
-        install_command = ('/home/venv/bin/pip install toil-scripts==%s' % self.toilScripts)
+        install_command = ['/home/venv/bin/pip', 'install', 'toil-scripts==%s' % self.toilScripts]
         AWSProvisioner._sshAppliance(leader.ip_address, command=install_command)
 
         # install curl
-        install_command = 'sudo apt-get -y install curl'
+        install_command = ['sudo', 'apt-get', '-y', 'install', 'curl']
         AWSProvisioner._sshAppliance(leader.ip_address, command=install_command)
 
         toilOptions = ['--batchSystem=mesos',
@@ -86,12 +86,13 @@ class AWSProvisionerTest(ToilTest):
 
         toilOptions = ' '.join(toilOptions)
 
-        runCommand = 'bash -c \\"export PATH=/home/venv/bin/:$PATH;export TOIL_SCRIPTS_TEST_NUM_SAMPLES=%i; export TOIL_SCRIPTS_TEST_TOIL_OPTIONS=' + pipes.quote(toilOptions) + \
-                     '; export TOIL_SCRIPTS_TEST_JOBSTORE=' + self.jobStore + \
-                     '; /home/venv/bin/python -m unittest -v' + \
-                     ' toil_scripts.rnaseq_cgl.test.test_rnaseq_cgl.RNASeqCGLTest.test_manifest\\"'
+        runCommand = ['bash -c "export PATH=/home/venv/bin/:$PATH;'
+                      'export TOIL_SCRIPTS_TEST_NUM_SAMPLES='+str(self.numSamples)+
+                      '; export TOIL_SCRIPTS_TEST_TOIL_OPTIONS=' + pipes.quote(toilOptions) + \
+                      '; export TOIL_SCRIPTS_TEST_JOBSTORE=' + self.jobStore + \
+                      '; /home/venv/bin/python -m unittest -v' + \
+                      ' toil_scripts.rnaseq_cgl.test.test_rnaseq_cgl.RNASeqCGLTest.test_manifest"']
 
-        runCommand %= self.numSamples
 
         AWSProvisioner._sshAppliance(leader.ip_address, runCommand)
 
