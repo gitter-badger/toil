@@ -86,11 +86,11 @@ class AWSProvisionerTest(ToilTest):
 
         toilOptions = ' '.join(toilOptions)
 
-        runCommand = ['bash -c "export PATH=/home/venv/bin/:$PATH;'
-                      'export TOIL_SCRIPTS_TEST_NUM_SAMPLES='+str(self.numSamples)+
-                      '; export TOIL_SCRIPTS_TEST_TOIL_OPTIONS=' + pipes.quote(toilOptions) + \
-                      '; export TOIL_SCRIPTS_TEST_JOBSTORE=' + self.jobStore + \
-                      '; /home/venv/bin/python -m unittest -v' + \
+        runCommand = ['bash -c "PATH=/home/venv/bin/:$PATH '
+                      'TOIL_SCRIPTS_TEST_NUM_SAMPLES='+str(self.numSamples)+
+                      ' TOIL_SCRIPTS_TEST_TOIL_OPTIONS=' + pipes.quote(toilOptions) + \
+                      ' TOIL_SCRIPTS_TEST_JOBSTORE=' + self.jobStore + \
+                      ' /home/venv/bin/python -m unittest -v' + \
                       ' toil_scripts.rnaseq_cgl.test.test_rnaseq_cgl.RNASeqCGLTest.test_manifest"']
 
 
